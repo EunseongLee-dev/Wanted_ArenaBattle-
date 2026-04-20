@@ -2,6 +2,7 @@
 
 #include "Character/ABCharacterBase.h"
 #include "ABCharacterControlData.h"
+#include "GameFramework/CharacterMovementComponent.h"
 
 // Sets default values
 AABCharacterBase::AABCharacterBase()
@@ -9,26 +10,44 @@ AABCharacterBase::AABCharacterBase()
  	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
-	// ¸Ê ¼³Á¤
-	static ConstructorHelpers::FObjectFinder<UABCharacterControlData> ShoulderDataRef(TEXT("/Game/ArenaBattle/CharacterControl/ABC_Shoulder.ABC_Shoulder"));
-	
+	// ¸Ê ¼³Á¤.
+	static ConstructorHelpers::FObjectFinder<UABCharacterControlData> ShoulderDataRef(
+		TEXT("/Game/ArenaBattle/CharacterControl/ABC_Shoulder.ABC_Shoulder")
+	);
 	if (ShoulderDataRef.Succeeded())
 	{
-		CharacterControlManager.Add(ECharacterControlType::Shoulder, ShoulderDataRef.Object);
+		CharacterControlManager.Add(
+			ECharacterControlType::Shoulder,
+			ShoulderDataRef.Object
+		);
 	}
 
-
-	static ConstructorHelpers::FObjectFinder<UABCharacterControlData> QuarterDataRef(TEXT("/Game/ArenaBattle/CharacterControl/ABC_Quater.ABC_Quater"));
-
+	static ConstructorHelpers::FObjectFinder<UABCharacterControlData> QuarterDataRef(
+		TEXT("/Game/ArenaBattle/CharacterControl/ABC_Quater.ABC_Quater")
+	);
 	if (QuarterDataRef.Succeeded())
 	{
-		CharacterControlManager.Add(ECharacterControlType::Quater, QuarterDataRef.Object);
+		CharacterControlManager.Add(
+			ECharacterControlType::Quarter,
+			QuarterDataRef.Object
+		);
 	}
 }
 
-void AABCharacterBase::SetCharacterControlData(const UABCharacterControlData* InCharacterControlData)
+void AABCharacterBase::SetCharacterContolData(
+	const UABCharacterControlData* InCharacterControlData)
 {
+	// Pawn.
+	bUseControllerRotationYaw 
+		= InCharacterControlData->bUseControllerRotationYaw;
 
+	// CharacterMovement.
+	GetCharacterMovement()->bUseControllerDesiredRotation
+		= InCharacterControlData->bUseControllerDesiredRotation;
+
+	GetCharacterMovement()->bOrientRotationToMovement 
+		= InCharacterControlData->bOrientRotationToMovement;
+
+	GetCharacterMovement()->RotationRate 
+		= InCharacterControlData->RotationRate;
 }
-
-

@@ -10,10 +10,11 @@
  * 
  */
 UCLASS()
-class ARENABATTLE_API UABCharacterControlData : public UPrimaryDataAsset
+class ARENABATTLE_API UABCharacterControlData 
+	: public UPrimaryDataAsset
 {
 	GENERATED_BODY()
-
+	
 public:
 	UABCharacterControlData();
 
@@ -53,4 +54,4 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = SpringArm)
 	uint32 bInheritRoll : 1;
-}; 
+};

@@ -6,12 +6,12 @@
 #include "GameFramework/Character.h"
 #include "ABCharacterBase.generated.h"
 
-// 열거형 (입력 컨트롤을 관리하기 위함)
+// 열거형 (입력 컨트롤을 관리하기 위함).
 UENUM()
 enum class ECharacterControlType : uint8
 {
 	Shoulder,
-	Quater
+	Quarter
 };
 
 UCLASS()
@@ -24,12 +24,14 @@ public:
 	AABCharacterBase();
 
 protected:
-	// 컨트롤 데이터 설정
-	virtual void SetCharacterControlData(const class UABCharacterControlData* InCharacterControlData);
+
+	// 컨트롤 데이터 설정.
+	virtual void SetCharacterContolData(
+		const class UABCharacterControlData* InCharacterControlData
+	);
 
 protected:
-	// 컨트롤 타입 별 데이터 관리를 위한 맵
+	// 컨트롤 타입 별 데이터 관리를 위한 맵.
 	UPROPERTY(EditAnywhere, Category = CharacterControl)
 	TMap<ECharacterControlType, class UABCharacterControlData*> CharacterControlManager;
-
 };
