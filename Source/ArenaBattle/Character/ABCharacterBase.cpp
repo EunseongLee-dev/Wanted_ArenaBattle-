@@ -14,6 +14,39 @@ AABCharacterBase::AABCharacterBase()
  	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
+	// 콜리전 프로필 설정
+	GetCapsuleComponent()->SetCollisionProfileName(CPROFILE_ABCAPSULE);
+
+	// 메시 컴포넌트 설정.
+	GetMesh()->SetRelativeLocationAndRotation(
+		FVector(0.0f, 0.0f, -88.0f),
+		FRotator(0.0f, -90.0f, 0.0f)
+	);
+
+	// 메시 애셋 지정 (검색 필요함).
+	static ConstructorHelpers::FObjectFinder<USkeletalMesh> CharacterMesh(
+		TEXT("/Game/InfinityBladeWarriors/Character/CompleteCharacters/SK_CharM_Ram.SK_CharM_Ram")
+	);
+
+	// 로드 성공했으면 설정.
+	if (CharacterMesh.Succeeded())
+	{
+		GetMesh()->SetSkeletalMesh(CharacterMesh.Object);
+	}
+
+	// 애님 블루프린트 클래스 정보 지정.
+	static ConstructorHelpers::FClassFinder<UAnimInstance> CharacterAnim(
+		TEXT("/Game/ArenaBattle/Animation/ABP_ABCharacter.ABP_ABCharacter_C")
+	);
+
+	if (CharacterAnim.Succeeded())
+	{
+		GetMesh()->SetAnimInstanceClass(CharacterAnim.Class);
+	}
+
+	// 메시 콜리전 끄기
+	GetMesh()->SetCollisionProfileName(TEXT("NoCollision"));
+
 	// 맵 설정.
 	static ConstructorHelpers::FObjectFinder<UABCharacterControlData> ShoulderDataRef(
 		TEXT("/Game/ArenaBattle/CharacterControl/ABC_Shoulder.ABC_Shoulder")
@@ -35,6 +68,23 @@ AABCharacterBase::AABCharacterBase()
 			ECharacterControlType::Quarter,
 			QuarterDataRef.Object
 		);
+	}
+
+	// 몽타주 및 액션 데이터 기본 값 설정
+	static ConstructorHelpers::FObjectFinder<UAnimMontage> ComboAttackMontageRef(
+		TEXT("/Game/ArenaBattle/Animation/AM_ComboAttack.AM_ComboAttack")
+	);
+	if (ComboAttackMontageRef.Succeeded())
+	{
+		ComboAttackMontage = ComboAttackMontageRef.Object;
+	}
+
+	static ConstructorHelpers::FObjectFinder<UABComboActionData> ComboActionDataRef(
+		TEXT("/Game/ArenaBattle/ComboData/ABA_ComboAction.ABA_ComboAction")
+	);
+	if (ComboActionDataRef.Succeeded())
+	{
+		ComboActionData = ComboActionDataRef.Object;
 	}
 }
 
@@ -245,10 +295,28 @@ void AABCharacterBase::AttackHitCheck()
 		GetWorld(),
 		CapsuleOrigin,
 		CapsuleHalfHeight,
-		AttackRange,
+		AttackRadius,
 		FRotationMatrix::MakeFromZ(GetActorForwardVector()).ToQuat(), 
 		DrawColor,
 		false,
 		5.0f);
 #endif
+}
+
+float AABCharacterBase::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
+{
+	Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
+
+	// 죽음 설정
+	SetDead();
+
+	return DamageAmount;
+}
+
+void AABCharacterBase::SetDead()
+{
+}
+
+void AABCharacterBase::PlayDeadAnimation()
+{
 }
