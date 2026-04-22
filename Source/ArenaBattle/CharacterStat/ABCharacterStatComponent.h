@@ -6,6 +6,10 @@
 #include "Components/ActorComponent.h"
 #include "ABCharacterStatComponent.generated.h"
 
+// 델리게이트 선언
+DECLARE_MULTICAST_DELEGATE(FOnHpZeroDelegate);
+DECLARE_MULTICAST_DELEGATE_OneParam(FOnHpChangedDelegate, float/*CurrentHp*/);
+
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class ARENABATTLE_API UABCharacterStatComponent : public UActorComponent
@@ -20,7 +24,23 @@ protected:
 	// Called when the game starts
 	virtual void BeginPlay() override;
 
+	// Setter
+	void SetHp(float NewHp);
+
 public:
+	// Getter
+	FORCEINLINE float GetMaxHp() const { return MaxHp; }
+	FORCEINLINE float GetCurrentHp() const { return CurrentHp; }
+
+	// 데미지 적용 함수
+	float ApplyDamage(float InDamage);
+
+public:
+	// 체력을 모두 소진했을 때 발행할 델리게이트
+	FOnHpZeroDelegate OnHpZero;
+	
+	// Hp가 변동될 때마다 발행할 델리게이트
+	FOnHpChangedDelegate OnHpChanged;
 
 protected:
 	// 체력 정보
