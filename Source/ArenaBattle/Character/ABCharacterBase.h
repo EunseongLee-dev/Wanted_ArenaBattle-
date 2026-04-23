@@ -83,7 +83,7 @@ protected:
 	virtual void TakeItem(UABItemData* InItemData) override;
 
 	// 아이템 종류마다 처리될 함수
-	virtual void DringPotion(UABItemData* InItemData);
+	virtual void DrinkPotion(UABItemData* InItemData);
 	virtual void EquipWeapon(UABItemData* InItemData);
 	virtual void ReadScroll(UABItemData* InItemData);
 
@@ -131,5 +131,9 @@ protected:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Widget)
 	TObjectPtr<class UABWidgetComponent> HpBar;	
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Equipment)
+	TObjectPtr<class USkeletalMeshComponent> Weapon;
+
 };
 
