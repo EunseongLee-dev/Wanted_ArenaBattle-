@@ -6,6 +6,7 @@
 #include "GameFramework/Character.h"
 #include "Interface/ABAnimationAttackInterface.h"
 #include "Interface/ABCharacterWidgetInterface.h"
+#include "Interface/ABCharacterItemInterface.h"
 #include "ABCharacterBase.generated.h"
 
 // 열거형 (입력 컨트롤을 관리하기 위함).
@@ -16,10 +17,14 @@ enum class ECharacterControlType : uint8
 	Quarter
 };
 
+// 아이템 획득 처리를 위한 델리게이트 선언
+DECLARE_DELEGATE_OneParam(FOnTakeItemDelegate, class UABItemData* /*InItemData*/)
+
 UCLASS()
 class ARENABATTLE_API AABCharacterBase : public ACharacter,
 	public IABAnimationAttackInterface,
-	public IABCharacterWidgetInterface
+	public IABCharacterWidgetInterface,
+	public IABCharacterItemInterface
 {
 	GENERATED_BODY()
 
@@ -74,6 +79,17 @@ protected:
 	// 시간 전에 공격 입력이 제대로 들어왔는지 확인
 	void ComboCheck();
 
+	// 아이템 습득시 호출될 함수 (인터페이스를 통해)
+	virtual void TakeItem(UABItemData* InItemData) override;
+
+	// 아이템 종류마다 처리될 함수
+	virtual void DringPotion(UABItemData* InItemData);
+	virtual void EquipWeapon(UABItemData* InItemData);
+	virtual void ReadScroll(UABItemData* InItemData);
+
+	// 아이템 처리를 위한 델리게이트 관리 배열 
+	TArray<FOnTakeItemDelegate> TakeItemActions;
+
 protected:
 	// 컨트롤 타입 별 데이터 관리를 위한 맵.
 	UPROPERTY(EditAnywhere, Category = CharacterControl)
@@ -114,7 +130,6 @@ protected:
 	TObjectPtr<class UABCharacterStatComponent> Stat;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Widget)
-	TObjectPtr<class UABWidgetComponent> HpBar;
-
+	TObjectPtr<class UABWidgetComponent> HpBar;	
 };
 
