@@ -101,6 +101,15 @@ AABStageGimmick::AABStageGimmick()
 		// 생성된 트리거 컴포넌트를 배열에 추가
 		GateTriggers.Add(GateTrigger);
 	}
+
+	// 시작 상태 값 설정
+	CurrentState = EStageState::Ready;
+
+	// 상태에 따라 처리하도록 맵 설정
+	StateChangedActions.Add(EStageState::Ready, FOnStateChangedDelegate::CreateUObject(this, &AABStageGimmick::SetReady));
+	StateChangedActions.Add(EStageState::Fight, FOnStateChangedDelegate::CreateUObject(this, &AABStageGimmick::SetFight));
+	StateChangedActions.Add(EStageState::Reward, FOnStateChangedDelegate::CreateUObject(this, &AABStageGimmick::SetChooseReward));
+	StateChangedActions.Add(EStageState::Next, FOnStateChangedDelegate::CreateUObject(this, &AABStageGimmick::SetChooseNext));
 }
 
 void AABStageGimmick::OnStageTriggerBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
@@ -113,5 +122,93 @@ void AABStageGimmick::OnGateTriggerBeginOverlap(UPrimitiveComponent* OverlappedC
 	UE_LOG(LogTemp, Log, TEXT("Gate Tag: %s"), *OverlappedComponent->ComponentTags[0].ToString());
 }
 
+void AABStageGimmick::OpenAllGates()
+{
+	// 문 액터 배열 순회하면서 회전 값 설정
+	for (auto Gate : Gates)
+	{
+		Gate.Value->SetRelativeRotation(FRotator(0.0f, -90.0f, 0.0f));
+	}
+}
 
+void AABStageGimmick::CloseAllGates()
+{
+	// 문 액터 배열 순회하면서 회전 값 설정
+	for (auto Gate : Gates)
+	{
+		Gate.Value->SetRelativeRotation(FRotator::ZeroRotator);
+	}
+}
+
+void AABStageGimmick::SetState(EStageState InNewState)
+{
+	// 현재 상태 업데이트
+	CurrentState = InNewState;
+
+	// 전달된 상태가 맵에 있는지 확인 후 처리
+	if (StateChangedActions.Contains(InNewState))
+	{
+		StateChangedActions[InNewState].ExecuteIfBound();
+	}
+}
+
+void AABStageGimmick::SetReady()
+{
+	// 플레이어가 입장 가능하도록 가운데 트리거 활성화
+	StageTrigger->SetCollisionProfileName(CPROFILE_ABTRIGGER);
+
+	// 플레이어가 문과 상호작용하지 않도록 문 콜리전 비활성화
+	for (auto GateTrigger : GateTriggers)
+	{
+		GateTrigger->SetCollisionProfileName(CPROFILE_NOCOLLISION);
+	}
+
+	// 플레이어가 나가지 못하게 문 닫기
+	CloseAllGates();
+}
+
+void AABStageGimmick::SetFight()
+{
+	// 가운데 트리거 비활성화
+	StageTrigger->SetCollisionProfileName(CPROFILE_NOCOLLISION);
+
+	// 문 트리가 비활성화
+	for (auto GateTrigger : GateTriggers)
+	{
+		GateTrigger->SetCollisionProfileName(CPROFILE_NOCOLLISION);
+	}
+
+	// 문 닫기
+	CloseAllGates();
+}
+
+void AABStageGimmick::SetChooseReward()
+{
+	// 가운데 트리거 비활성화
+	StageTrigger->SetCollisionProfileName(CPROFILE_NOCOLLISION);
+
+	// 문 트리가 비활성화
+	for (auto GateTrigger : GateTriggers)
+	{
+		GateTrigger->SetCollisionProfileName(CPROFILE_NOCOLLISION);
+	}
+
+	// 문 닫기
+	CloseAllGates();
+}
+
+void AABStageGimmick::SetChooseNext()
+{
+	// 가운데 트리거 비활성화
+	StageTrigger->SetCollisionProfileName(CPROFILE_NOCOLLISION);
+
+	// 문 트리가 활성화
+	for (auto GateTrigger : GateTriggers)
+	{
+		GateTrigger->SetCollisionProfileName(CPROFILE_ABTRIGGER);
+	}
+
+	// 문 열기
+	OpenAllGates();
+}
 
