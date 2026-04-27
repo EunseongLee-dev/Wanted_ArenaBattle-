@@ -196,7 +196,7 @@ void AABCharacterBase::COmboActionBegin()
 	if (AnimInstance)
 	{
 		// 몽타주 재생 속도
-		const float AttackSpeedRate = 1.0f;
+		const float AttackSpeedRate = Stat->GetTotalStat().AttackSpeed;
 
 		// 몽타주 재생
 		AnimInstance->Montage_Play(ComboAttackMontage, AttackSpeedRate);
@@ -241,7 +241,7 @@ void AABCharacterBase::SetComboCheckTimer()
 	ensureAlways(ComboActionData->EffectiveFrameCount.IsValidIndex(ComboIndex));
 	
 	// 애니메이션 재생 속도도 고려(배속)
-	const float AttackSpeedRate = 1.0f;
+	const float AttackSpeedRate = Stat->GetTotalStat().AttackSpeed;
 	
 	// 타이머 설정에 사용할 시간 값
 	// 콤보 액션 데이터에는 프레임 값이 설정되어 있음
@@ -342,10 +342,8 @@ void AABCharacterBase::SetUpCharacterWidget(UABUserWidget* InUserWidget)
 	UABHpBarWidget* HpBarWidget = Cast<UABHpBarWidget>(InUserWidget);
 	if (HpBarWidget)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("Character Name: %s, MaxHp: %f"), *GetName(), Stat->GetMaxHp());
-
 		// 체력 관련 값 설정
-		HpBarWidget->SetMaxHp(Stat->GetMaxHp());
+		HpBarWidget->SetMaxHp(Stat->GetTotalStat().MaxHp);
 		HpBarWidget->UpdateHpBar(Stat->GetCurrentHp());
 		
 		// 델리게이트 등록
@@ -364,7 +362,7 @@ void AABCharacterBase::PostInitializeComponents()
 void AABCharacterBase::AttackHitCheck()
 {
 	// 공격 범위
-	const float AttackRange = 40.0f;
+	const float AttackRange = Stat->GetTotalStat().AttackRange;
 
 	// 트레이스에 사용할 구체의 반지름
 	const float AttackRadius = 50.0f;
@@ -398,7 +396,7 @@ void AABCharacterBase::AttackHitCheck()
 	if(HitDetected)
 	{ 
 		// 전달할 데미지 양
-		const float AttackDamage = 100.0f;
+		const float AttackDamage = Stat->GetTotalStat().Attack;
 
 		// 데미지 이벤트 변수
 		FDamageEvent DamageEvent;
@@ -472,4 +470,14 @@ void AABCharacterBase::PlayDeadAnimation()
 		// 죽음 몽타주 재생
 		AnimInstance->Montage_Play(DeadMontage);
 	}
+}
+
+int32 AABCharacterBase::GetLevel() const
+{
+	return Stat->GetCurrentLevel();
+}
+
+void AABCharacterBase::SetLevel(int32 InNewLevel)
+{
+	Stat->SetLevelStat(InNewLevel);
 }

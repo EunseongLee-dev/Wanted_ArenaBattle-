@@ -189,7 +189,13 @@ void AABStageGimmick::OnGateTriggerBeginOverlap(UPrimitiveComponent* OverlappedC
 	}
 
 	// 충돌이 안됐으면(비어 있으면) 스테이지 액터 생성
-	GetWorld()->SpawnActor<AABStageGimmick>(NewLocation, FRotator::ZeroRotator);
+	AABStageGimmick* NewGimmick = GetWorld()->SpawnActor<AABStageGimmick>(NewLocation, FRotator::ZeroRotator);
+
+	if (NewGimmick)
+	{
+		// 새로 생성된 스테이지의 레벨 + 1
+		NewGimmick->SetStageNum(CurrentStageNum + 1);
+	}
 }
 
 void AABStageGimmick::OpenAllGates()
@@ -308,23 +314,31 @@ void AABStageGimmick::OnOpponentSpawn()
 	// 대전 상대 NPC 생성
 	// 특정 위치(원점에서 높이만 보정)를 지정해서 사용
 	const FVector SpawnLocation = GetActorLocation() + FVector::UpVector * 88.0f;
+	const FTransform SpawnTransform(SpawnLocation);
 
 	// NPC 생성
-	AActor* OpponentActor = GetWorld()->SpawnActor(OpponentClass, &SpawnLocation, &FRotator::ZeroRotator);
+	AABCharacterNonPlayer* ABOpponentCharacter
+		= GetWorld()->SpawnActorDeferred<AABCharacterNonPlayer>(OpponentClass,SpawnTransform);
 
 	// 예외 처리 (생성한 액터가 의도한 타입인지 확인)
-	AABCharacterNonPlayer* ABOpponentCharacter = Cast<AABCharacterNonPlayer>(OpponentActor);
+	// AABCharacterNonPlayer* ABOpponentCharacter = Cast<AABCharacterNonPlayer>(OpponentActor);
 	
 	// 형변환에 실패하면 의도한 타입이 아니기 때문에 종료
 	if (!ABOpponentCharacter)
 	{
 		// 실패하면 삭제 처리
-		OpponentActor->Destroy(); // 선택사항
+		// ABOpponentCharacter->Destroy(); // 선택사항
 		return;
 	}
 
 	// NPC가 죽었을 때 발행되는 이벤트에 함수 등록
-	OpponentActor->OnDestroyed.AddDynamic(this, &AABStageGimmick::OnOpponentDestroyed);
+	ABOpponentCharacter->OnDestroyed.AddDynamic(this, &AABStageGimmick::OnOpponentDestroyed);
+
+	// 현재 스테이지 순번을 NPC 레벨로 설정
+	ABOpponentCharacter->SetLevel(CurrentStageNum);
+
+	// 초기화 작업을 완료했으면 처리 완료했다고 전달
+	ABOpponentCharacter->FinishSpawning(SpawnTransform);
 }
 
 void AABStageGimmick::OnRewardTriggerBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
