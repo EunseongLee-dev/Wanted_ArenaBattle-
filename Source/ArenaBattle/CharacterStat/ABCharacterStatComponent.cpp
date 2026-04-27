@@ -77,6 +77,3 @@ float UABCharacterStatComponent::ApplyDamage(float InDamage)
 
 	return ActualDamage;
 }
-
-
-

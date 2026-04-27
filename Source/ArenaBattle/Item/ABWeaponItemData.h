@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Item/ABItemData.h"
+#include "GameData/ABCharacterStat.h"
 #include "ABWeaponItemData.generated.h"
 
 /**
@@ -26,4 +27,7 @@ public:
 	TSoftObjectPtr<USkeletalMesh> WeaponMesh;
 	//TObjectPtr<USkeletalMesh> WeaponMesh;
 	
+	// 부가 스텟 데이터
+	UPROPERTY(EditAnyWhere, Category = Stat)
+	FABCharacterStat ModifierStat;
 };

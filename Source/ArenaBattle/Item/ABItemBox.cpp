@@ -38,7 +38,7 @@ AABItemBox::AABItemBox()
 	Trigger->SetBoxExtent(FVector(40.0f, 42.0f, 30.0f));
 
 	// 델리게이트에 함수 등록
-	Trigger->OnComponentBeginOverlap.AddDynamic(this, &AABItemBox::OnOverlapBegin);
+	// Trigger->OnComponentBeginOverlap.AddDynamic(this, &AABItemBox::OnOverlapBegin);
 
 	// 에셋 로드 (메시)
 	static ConstructorHelpers::FObjectFinder<UStaticMesh> BoxMeshRef(
@@ -100,6 +100,9 @@ void AABItemBox::PostInitializeComponents()
 
 	// 제대로 설정됐는지 확인
 	ensureAlways(Item);
+
+	// 트랜스폼
+	Trigger->OnComponentBeginOverlap.AddDynamic(this, &AABItemBox::OnOverlapBegin);
 }
 
 void AABItemBox::OnOverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
