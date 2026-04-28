@@ -41,7 +41,7 @@ protected:
 	virtual float GetAIDetectRange() override;
 	virtual float GetAIAttackRange() override;
 	virtual float GetAITurnSpeed() override;
-	virtual float AttackByAI() override;
+	virtual void AttackByAI() override;
 	virtual void SetAIAttackDelegate(const FAICharacterAttackFinished& InOnAttackFisished) override;
 
 	// SetAIAttackDelegate 함수로부터 전달받은 델리게이트를 저장할 변수

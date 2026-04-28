@@ -105,17 +105,13 @@ float AABCharacterNonPlayer::GetAIAttackRange()
 
 float AABCharacterNonPlayer::GetAITurnSpeed()
 {
-	return 0.0f;
+	return 2.0f;
 }
 
-float AABCharacterNonPlayer::AttackByAI()
+void AABCharacterNonPlayer::AttackByAI()
 {
 	// 공격 재생
 	ProcessComboCommand();
-
-	// 공격 끝난 후 처리
-	// 공격이 언제 끝났는지 모름
-	return 0.0f;
 }
 
 void AABCharacterNonPlayer::SetAIAttackDelegate(const FAICharacterAttackFinished& InOnAttackFisished)

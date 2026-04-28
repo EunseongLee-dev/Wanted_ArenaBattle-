@@ -31,7 +31,7 @@ public:
 	virtual float GetAIAttackRange() = 0;
 	virtual float GetAITurnSpeed() = 0;
 	// Task에서 공격 명령을 전달할 때 사용하는 함수
-	virtual float AttackByAI() = 0;
+	virtual void AttackByAI() = 0;
 
 	// 캐릭터에서 델리게이트를 넘길 때 사용할 함수
 	virtual void SetAIAttackDelegate(const FAICharacterAttackFinished& InOnAttackFisished) = 0;
