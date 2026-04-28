@@ -230,6 +230,14 @@ void AABCharacterBase::ComboActionEnd(UAnimMontage* TargetMontage, bool bInterru
 
 	// 몽타주 재생이 종료되면 캐릭터 이동을 다시 원상 복구
 	GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_Walking);
+	
+	// 공격이 끝나면 NotifyComboActionEnd 함수 호출
+	NotifyComboActionEnd();
+}
+
+void AABCharacterBase::NotifyComboActionEnd()
+{
+
 }
 
 void AABCharacterBase::SetComboCheckTimer()
@@ -368,7 +376,7 @@ void AABCharacterBase::AttackHitCheck()
 	const float AttackRange = Stat->GetTotalStat().AttackRange;
 
 	// 트레이스에 사용할 구체의 반지름
-	const float AttackRadius = 50.0f;
+	const float AttackRadius = Stat->GetAttackRadius();
 
 	// 콜리전에 사용할 콜리전 파라미터 설정
 	// 나를 제외해달라고 설정하기 위해
