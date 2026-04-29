@@ -11,7 +11,7 @@ UABGameSingleton::UABGameSingleton()
 	);
 
 	// 에셋 로드 성공 시 설정
-	if (DataTableRef.Succeeded())
+	if (DataTableRef.Succeeded()) 
 	{
 		// UDataTable 변수 저장
 		const UDataTable* DataTable = DataTableRef.Object;

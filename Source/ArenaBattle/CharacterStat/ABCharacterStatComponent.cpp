@@ -19,24 +19,40 @@ UABCharacterStatComponent::UABCharacterStatComponent()
 
 	// 공격 반경 설정
 	AttackRadius = 50.0f;
+
+	// InitializeComponent 함수 호출을 위해 true로 설정
+	bWantsInitializeComponent = true;
 }
 
 
 // Called when the game starts
-void UABCharacterStatComponent::BeginPlay()
-{
-	Super::BeginPlay();
+//void UABCharacterStatComponent::BeginPlay()
+//{
+//	Super::BeginPlay();
+//
+//	// 게임이 시작되면 최대 체력에서 시작하도록 설정
+//	//SetHp(MaxHp);
+//
+//	// 시작할 때 현재 레벨에 맞는 스텟 데이터 설정
+//	SetLevelStat(CurrentLevel);
+//	SetHp(BaseStat.MaxHp);
+//}
 
-	// 게임이 시작되면 최대 체력에서 시작하도록 설정
-	//SetHp(MaxHp);
+// BeginPlay 대체
+void UABCharacterStatComponent::InitializeComponent() 
+{
+	Super::InitializeComponent();
+	UE_LOG(LogTemp, Warning, TEXT("!!! InitializeComponent Called !!!"));
 
 	// 시작할 때 현재 레벨에 맞는 스텟 데이터 설정
 	SetLevelStat(CurrentLevel);
+	UE_LOG(LogTemp, Warning, TEXT("!!! MaxHp After SetLevelStat: %f !!!"), BaseStat.MaxHp);
 	SetHp(BaseStat.MaxHp);
 }
 
 void UABCharacterStatComponent::SetHp(float NewHp)
 {
+	// 현재 체력 값 갱신
 	CurrentHp = FMath::Clamp<float>(NewHp, 0.0f, BaseStat.MaxHp);
 
 	// 체력 변경 이벤트 발행
@@ -51,7 +67,10 @@ void UABCharacterStatComponent::SetLevelStat(int32 InNewLevel)
 	CurrentLevel = FMath::Clamp(InNewLevel, 1, UABGameSingleton::Get().CharacterMaxLevel);
 
 	// 스텟 데이터 설정
-	BaseStat = UABGameSingleton::Get().GetCharacterStat(CurrentLevel);
+	//BaseStat = UABGameSingleton::Get().GetCharacterStat(CurrentLevel);
+	SetBaseStat(UABGameSingleton::Get().GetCharacterStat(CurrentLevel));
+
+	UE_LOG(LogTemp, Error, TEXT("BaseStat MaxHp: %f, Level: %d"), BaseStat.MaxHp, CurrentLevel);
 
 	// 확인
 	ensureAlways(BaseStat.MaxHp > 0.0f);
